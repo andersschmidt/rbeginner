@@ -18,3 +18,10 @@ The basic tutorial can then be started by running:
 learnr::run_tutorial("basics", package = "rbeginner")
 ```
 
+
+The dplyr tutorial can be started by running: 
+
+```r
+learnr::run_tutorial("databasics", package = "rbeginner")
+```
+

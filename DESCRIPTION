@@ -1,9 +1,9 @@
 Package: rbeginner
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Title: RBeginner - Simple tutorials for an R Workshop
+Version: 0.0.1
+Authors@R: person("Emil", "Tveden Bjerglund", email = "emil@tbjerglund.dk", role = c("aut", "cre"))
+Description: RBeginner contains tutorials that introduce the new R user to the basics methods needed to do data treatment in R. 
 Depends: R (>= 3.4.0)
-License: What license is it under?
+License: MIT | file LICENSE
 Encoding: UTF-8
 LazyData: true
