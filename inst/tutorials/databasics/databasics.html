@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+<meta name="progressive" content="false" />
+<meta name="allow-skip" content="false" />
+
+<title>Data basics</title>
+
+
+<!-- highlightjs -->
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+</head>
+
+<body>
+
+
+
+<div class="pageContent band">
+<div class="bandContent page">
+
+<div class="topics">
+
+<div id="section-simple-mutations-of-data-using-dplyr" class="section level2">
+<h2>Simple mutations of data using <code>dplyr</code></h2>
+<p>R has some built-in functions for working with dataframes. As is often the case, however, a package has been made that makes this even easier. In this tutorial, we will use <code>dplyr</code> from the <em>tidyverse</em>.</p>
+<p>For this, we will use the built-in dataset call <code>iris</code>, which contain measurements lengths and widths for 50 flowers.</p>
+<pre class="r"><code>head(iris, 3)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Sepal.Length"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Sepal.Width"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Petal.Length"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Petal.Width"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Species"],"name":[5],"type":["fctr"],"align":["left"]}],"data":[{"1":"5.1","2":"3.5","3":"1.4","4":"0.2","5":"setosa"},{"1":"4.9","2":"3.0","3":"1.4","4":"0.2","5":"setosa"},{"1":"4.7","2":"3.2","3":"1.3","4":"0.2","5":"setosa"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p><code>dplyr</code> has 5 basic functions which cover most data challenges:</p>
+<ul>
+<li>Pick observations by their values (<code>filter()</code>).</li>
+<li>Reorder the rows (<code>arrange()</code>).</li>
+<li>Pick variables by their names (<code>select()</code>).</li>
+<li>Create new variables with functions of existing variables (<code>mutate()</code>).</li>
+<li>Collapse many values down to a single summary (<code>summarise()</code>).</li>
+</ul>
+<div id="section-exercise-1" class="section level3">
+<h3>Exercise 1</h3>
+<p>Run the code below to see how a new column is generated. Then change the code, so the difference between <code>Sepal.Length</code> and <code>Petal.Length</code> is also calculated.</p>
+<div class="tutorial-exercise" data-label="mutate" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="5">
+<pre class="text"><code>iris %&gt;% 
+  mutate(product = Sepal.Length * Sepal.Width)</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="mutate-hint" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>Additional columns can be separated by a comma: mutate(col1 = x, col2 = y)</code></pre>
+</div>
+<div class="tutorial-exercise-support" data-label="mutate-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>iris %&gt;% 
+  mutate(product = Sepal.Length * Sepal.Width,
+         diff = Sepal.Length - Petal.Length)</code></pre>
+</div>
+</div>
+<div id="section-the-pipe-operator" class="section level3">
+<h3>The pipe operator (<code>%&gt;%</code>)</h3>
+<p>Did you notice the strange <code>%&gt;%</code> operator used in the example above? It is called the pipe, and is used to forward a dataframe into the next function. Generally, <code>mutate()</code> takes a dataframe as the first argument (<code>mutate(.data, ...)</code>) and then a set of expressions to define new columns. <code>%&gt;%</code> takes whatever is to the left of the operator, and ‘pipes’ it as the first argument to the function to the right. This means, that the following two lines of code are equivalent:</p>
+<pre class="r"><code>mutate(iris, product = Sepal.Length * Sepal.Width)
+iris %&gt;% mutate(product = Sepal.Length * Sepal.Width)</code></pre>
+<p>Why the pipe is effiecient will become apparent in the next example.</p>
+</div>
+</div>
+<div id="section-generating-summaries" class="section level2">
+<h2>Generating summaries</h2>
+<p>A very common problem in datascience is to generate some summary statistics for each group in a dataset. Our <code>iris</code> data contains three different types of flowers (setosa, versicolor, virginica). Let us calculate the mean value and standard deviation for the Sepal Length in each group. Notice that we can <em>chain</em> a set of operations using <code>%&gt;%</code>.</p>
+<div id="section-exercise-2" class="section level3">
+<h3>Exercise 2</h3>
+<p>Run the code below and see how the data is first group by <em>Species</em> and then summarised.</p>
+<p>Then modify the code so that the product variable from the previous example is calculated, and calculate the summary of that instead.</p>
+<div class="tutorial-exercise" data-label="summarise" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="5">
+<pre class="text"><code>iris %&gt;% 
+  group_by(Species) %&gt;% 
+  summarise(mean = mean(Sepal.Length), sd = sd(Sepal.Length))</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="summarise-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>iris %&gt;% 
+  mutate(product = Sepal.Length * Sepal.Width) %&gt;% 
+  group_by(Species) %&gt;% 
+  summarise(mean = mean(product), sd = sd(product))</code></pre>
+</div>
+</div>
+</div>
+<div id="section-selecting-and-filtering-data" class="section level2">
+<h2>Selecting and filtering data</h2>
+<p>Sometimes you wish to select specific parts of your data for closer examination. We can use <code>select()</code> to choose a set of columns and <code>filter()</code> to select rows based on given criteria.</p>
+<div id="section-select" class="section level3">
+<h3><code>select()</code></h3>
+<p><code>select()</code> chooses columns by name, or via a few helper functions (<code>starts_with()</code> and <code>ends_with()</code>).</p>
+<pre class="r"><code>iris %&gt;% 
+  select(Species, starts_with(&#39;Sepal&#39;))</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Species"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["Sepal.Length"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Sepal.Width"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"setosa","2":"5.1","3":"3.5"},{"1":"setosa","2":"4.9","3":"3.0"},{"1":"setosa","2":"4.7","3":"3.2"},{"1":"setosa","2":"4.6","3":"3.1"},{"1":"setosa","2":"5.0","3":"3.6"},{"1":"setosa","2":"5.4","3":"3.9"},{"1":"setosa","2":"4.6","3":"3.4"},{"1":"setosa","2":"5.0","3":"3.4"},{"1":"setosa","2":"4.4","3":"2.9"},{"1":"setosa","2":"4.9","3":"3.1"},{"1":"setosa","2":"5.4","3":"3.7"},{"1":"setosa","2":"4.8","3":"3.4"},{"1":"setosa","2":"4.8","3":"3.0"},{"1":"setosa","2":"4.3","3":"3.0"},{"1":"setosa","2":"5.8","3":"4.0"},{"1":"setosa","2":"5.7","3":"4.4"},{"1":"setosa","2":"5.4","3":"3.9"},{"1":"setosa","2":"5.1","3":"3.5"},{"1":"setosa","2":"5.7","3":"3.8"},{"1":"setosa","2":"5.1","3":"3.8"},{"1":"setosa","2":"5.4","3":"3.4"},{"1":"setosa","2":"5.1","3":"3.7"},{"1":"setosa","2":"4.6","3":"3.6"},{"1":"setosa","2":"5.1","3":"3.3"},{"1":"setosa","2":"4.8","3":"3.4"},{"1":"setosa","2":"5.0","3":"3.0"},{"1":"setosa","2":"5.0","3":"3.4"},{"1":"setosa","2":"5.2","3":"3.5"},{"1":"setosa","2":"5.2","3":"3.4"},{"1":"setosa","2":"4.7","3":"3.2"},{"1":"setosa","2":"4.8","3":"3.1"},{"1":"setosa","2":"5.4","3":"3.4"},{"1":"setosa","2":"5.2","3":"4.1"},{"1":"setosa","2":"5.5","3":"4.2"},{"1":"setosa","2":"4.9","3":"3.1"},{"1":"setosa","2":"5.0","3":"3.2"},{"1":"setosa","2":"5.5","3":"3.5"},{"1":"setosa","2":"4.9","3":"3.6"},{"1":"setosa","2":"4.4","3":"3.0"},{"1":"setosa","2":"5.1","3":"3.4"},{"1":"setosa","2":"5.0","3":"3.5"},{"1":"setosa","2":"4.5","3":"2.3"},{"1":"setosa","2":"4.4","3":"3.2"},{"1":"setosa","2":"5.0","3":"3.5"},{"1":"setosa","2":"5.1","3":"3.8"},{"1":"setosa","2":"4.8","3":"3.0"},{"1":"setosa","2":"5.1","3":"3.8"},{"1":"setosa","2":"4.6","3":"3.2"},{"1":"setosa","2":"5.3","3":"3.7"},{"1":"setosa","2":"5.0","3":"3.3"},{"1":"versicolor","2":"7.0","3":"3.2"},{"1":"versicolor","2":"6.4","3":"3.2"},{"1":"versicolor","2":"6.9","3":"3.1"},{"1":"versicolor","2":"5.5","3":"2.3"},{"1":"versicolor","2":"6.5","3":"2.8"},{"1":"versicolor","2":"5.7","3":"2.8"},{"1":"versicolor","2":"6.3","3":"3.3"},{"1":"versicolor","2":"4.9","3":"2.4"},{"1":"versicolor","2":"6.6","3":"2.9"},{"1":"versicolor","2":"5.2","3":"2.7"},{"1":"versicolor","2":"5.0","3":"2.0"},{"1":"versicolor","2":"5.9","3":"3.0"},{"1":"versicolor","2":"6.0","3":"2.2"},{"1":"versicolor","2":"6.1","3":"2.9"},{"1":"versicolor","2":"5.6","3":"2.9"},{"1":"versicolor","2":"6.7","3":"3.1"},{"1":"versicolor","2":"5.6","3":"3.0"},{"1":"versicolor","2":"5.8","3":"2.7"},{"1":"versicolor","2":"6.2","3":"2.2"},{"1":"versicolor","2":"5.6","3":"2.5"},{"1":"versicolor","2":"5.9","3":"3.2"},{"1":"versicolor","2":"6.1","3":"2.8"},{"1":"versicolor","2":"6.3","3":"2.5"},{"1":"versicolor","2":"6.1","3":"2.8"},{"1":"versicolor","2":"6.4","3":"2.9"},{"1":"versicolor","2":"6.6","3":"3.0"},{"1":"versicolor","2":"6.8","3":"2.8"},{"1":"versicolor","2":"6.7","3":"3.0"},{"1":"versicolor","2":"6.0","3":"2.9"},{"1":"versicolor","2":"5.7","3":"2.6"},{"1":"versicolor","2":"5.5","3":"2.4"},{"1":"versicolor","2":"5.5","3":"2.4"},{"1":"versicolor","2":"5.8","3":"2.7"},{"1":"versicolor","2":"6.0","3":"2.7"},{"1":"versicolor","2":"5.4","3":"3.0"},{"1":"versicolor","2":"6.0","3":"3.4"},{"1":"versicolor","2":"6.7","3":"3.1"},{"1":"versicolor","2":"6.3","3":"2.3"},{"1":"versicolor","2":"5.6","3":"3.0"},{"1":"versicolor","2":"5.5","3":"2.5"},{"1":"versicolor","2":"5.5","3":"2.6"},{"1":"versicolor","2":"6.1","3":"3.0"},{"1":"versicolor","2":"5.8","3":"2.6"},{"1":"versicolor","2":"5.0","3":"2.3"},{"1":"versicolor","2":"5.6","3":"2.7"},{"1":"versicolor","2":"5.7","3":"3.0"},{"1":"versicolor","2":"5.7","3":"2.9"},{"1":"versicolor","2":"6.2","3":"2.9"},{"1":"versicolor","2":"5.1","3":"2.5"},{"1":"versicolor","2":"5.7","3":"2.8"},{"1":"virginica","2":"6.3","3":"3.3"},{"1":"virginica","2":"5.8","3":"2.7"},{"1":"virginica","2":"7.1","3":"3.0"},{"1":"virginica","2":"6.3","3":"2.9"},{"1":"virginica","2":"6.5","3":"3.0"},{"1":"virginica","2":"7.6","3":"3.0"},{"1":"virginica","2":"4.9","3":"2.5"},{"1":"virginica","2":"7.3","3":"2.9"},{"1":"virginica","2":"6.7","3":"2.5"},{"1":"virginica","2":"7.2","3":"3.6"},{"1":"virginica","2":"6.5","3":"3.2"},{"1":"virginica","2":"6.4","3":"2.7"},{"1":"virginica","2":"6.8","3":"3.0"},{"1":"virginica","2":"5.7","3":"2.5"},{"1":"virginica","2":"5.8","3":"2.8"},{"1":"virginica","2":"6.4","3":"3.2"},{"1":"virginica","2":"6.5","3":"3.0"},{"1":"virginica","2":"7.7","3":"3.8"},{"1":"virginica","2":"7.7","3":"2.6"},{"1":"virginica","2":"6.0","3":"2.2"},{"1":"virginica","2":"6.9","3":"3.2"},{"1":"virginica","2":"5.6","3":"2.8"},{"1":"virginica","2":"7.7","3":"2.8"},{"1":"virginica","2":"6.3","3":"2.7"},{"1":"virginica","2":"6.7","3":"3.3"},{"1":"virginica","2":"7.2","3":"3.2"},{"1":"virginica","2":"6.2","3":"2.8"},{"1":"virginica","2":"6.1","3":"3.0"},{"1":"virginica","2":"6.4","3":"2.8"},{"1":"virginica","2":"7.2","3":"3.0"},{"1":"virginica","2":"7.4","3":"2.8"},{"1":"virginica","2":"7.9","3":"3.8"},{"1":"virginica","2":"6.4","3":"2.8"},{"1":"virginica","2":"6.3","3":"2.8"},{"1":"virginica","2":"6.1","3":"2.6"},{"1":"virginica","2":"7.7","3":"3.0"},{"1":"virginica","2":"6.3","3":"3.4"},{"1":"virginica","2":"6.4","3":"3.1"},{"1":"virginica","2":"6.0","3":"3.0"},{"1":"virginica","2":"6.9","3":"3.1"},{"1":"virginica","2":"6.7","3":"3.1"},{"1":"virginica","2":"6.9","3":"3.1"},{"1":"virginica","2":"5.8","3":"2.7"},{"1":"virginica","2":"6.8","3":"3.2"},{"1":"virginica","2":"6.7","3":"3.3"},{"1":"virginica","2":"6.7","3":"3.0"},{"1":"virginica","2":"6.3","3":"2.5"},{"1":"virginica","2":"6.5","3":"3.0"},{"1":"virginica","2":"6.2","3":"3.4"},{"1":"virginica","2":"5.9","3":"3.0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="section-exercise-3" class="section level3">
+<h3>Exercise 3</h3>
+<p>Write code that selects Species, Sepal.Length and Petal.Length.</p>
+<div class="tutorial-exercise" data-label="select" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="6">
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="select-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>iris %&gt;% 
+  select(Species, Sepal.Length, Petal.Length) # Or use ends_with(&quot;Length&quot;)</code></pre>
+</div>
+</div>
+<div id="section-filter" class="section level3">
+<h3><code>filter()</code></h3>
+<p>We can also choose data based on various conditions. We could e.g. wish to select all the flowers with a Petal width equal to 0.1. R provides a set of comparison operators that makes this efficient:</p>
+<ul>
+<li><code>&gt;</code> (greater than)</li>
+<li><code>&gt;=</code> (greater than or equal to)</li>
+<li><code>&lt;</code> (less than)</li>
+<li><code>&lt;=</code> (less than or equal to)</li>
+<li><code>!=</code> (not equal)</li>
+<li><code>==</code> (equal).</li>
+</ul>
+<pre class="r"><code>iris %&gt;% 
+  filter(Petal.Width == 0.1)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Sepal.Length"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Sepal.Width"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Petal.Length"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Petal.Width"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Species"],"name":[5],"type":["fctr"],"align":["left"]}],"data":[{"1":"4.9","2":"3.1","3":"1.5","4":"0.1","5":"setosa"},{"1":"4.8","2":"3.0","3":"1.4","4":"0.1","5":"setosa"},{"1":"4.3","2":"3.0","3":"1.1","4":"0.1","5":"setosa"},{"1":"5.2","2":"4.1","3":"1.5","4":"0.1","5":"setosa"},{"1":"4.9","2":"3.6","3":"1.4","4":"0.1","5":"setosa"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="section-exercise-4" class="section level3">
+<h3>Exercise 4</h3>
+<p>To demonstrate how to use <code>filter()</code> fill in the missing pieces in the code below to find the flowers that have Sepal length larger than 6.5 and a Petal length larger than 6.0.</p>
+<div class="tutorial-exercise" data-label="filter" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>iris %&gt;%
+  filter()</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="filter-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>iris %&gt;%
+  filter(Sepal.Length &gt; 6.5, Petal.Length &gt; 6.0)</code></pre>
+</div>
+
+<script type="application/shiny-prerendered" data-context="server-start">
+library(learnr)
+library(tidyverse)
+knitr::opts_chunk$set(echo = FALSE)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::register_http_handlers(session, metadata = NULL)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-mutate-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-mutate-code-editor`)), session)
+output$`tutorial-exercise-mutate-output` <- renderUI({
+  `tutorial-exercise-mutate-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-summarise-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-summarise-code-editor`)), session)
+output$`tutorial-exercise-summarise-output` <- renderUI({
+  `tutorial-exercise-summarise-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-select-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-select-code-editor`)), session)
+output$`tutorial-exercise-select-output` <- renderUI({
+  `tutorial-exercise-select-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-filter-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-filter-code-editor`)), session)
+output$`tutorial-exercise-filter-output` <- renderUI({
+  `tutorial-exercise-filter-result`()
+})
+</script>
+ <!--html_preserve-->
+<script type="application/shiny-prerendered" data-context="dependencies">
+{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["1.11.3"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/jquery-1.11.3"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["bootstrap"]},{"type":"character","attributes":{},"value":["3.3.5"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/bootstrap-3.3.5"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["viewport"]}},"value":[{"type":"character","attributes":{},"value":["width=device-width, initial-scale=1"]}]},{"type":"character","attributes":{},"value":["js/bootstrap.min.js","shim/html5shiv.min.js","shim/respond.min.js"]},{"type":"character","attributes":{},"value":["css/cerulean.min.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["pagedtable"]},{"type":"character","attributes":{},"value":["1.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/pagedtable-1.1"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/pagedtable.js"]},{"type":"character","attributes":{},"value":["css/pagedtable.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["highlightjs"]},{"type":"character","attributes":{},"value":["1.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/highlightjs-1.1"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["highlight.js"]},{"type":"character","attributes":{},"value":["textmate.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial"]},{"type":"character","attributes":{},"value":["0.8.0.9003"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial.js"]},{"type":"character","attributes":{},"value":["tutorial.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-autocompletion"]},{"type":"character","attributes":{},"value":["0.8.0.9003"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-autocompletion.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-diagnostics"]},{"type":"character","attributes":{},"value":["0.8.0.9003"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-diagnostics.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-format"]},{"type":"character","attributes":{},"value":["0.8.0.9003"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmarkdown/templates/tutorial/resources"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-format.js"]},{"type":"character","attributes":{},"value":["tutorial-format.css","rstudio-theme.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["1.11.3"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/jquery-1.11.3"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["font-awesome"]},{"type":"character","attributes":{},"value":["4.5.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/font-awesome-4.5.0"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["css/font-awesome.min.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["bootbox"]},{"type":"character","attributes":{},"value":["4.4.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/bootbox"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["bootbox.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["localforage"]},{"type":"character","attributes":{},"value":["1.4.3"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/localforage"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["localforage.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial"]},{"type":"character","attributes":{},"value":["0.8.0.9003"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial.js"]},{"type":"character","attributes":{},"value":["tutorial.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-autocompletion"]},{"type":"character","attributes":{},"value":["0.8.0.9003"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-autocompletion.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial-diagnostics"]},{"type":"character","attributes":{},"value":["0.8.0.9003"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial-diagnostics.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.2.6"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["1.5.15"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]}]}]}
+</script>
+<!--/html_preserve-->
+</div>
+</div>
+
+</div> <!-- topics -->
+
+<div class="topicsContainer">
+<div class="topicsPositioner">
+<div class="band">
+<div class="bandContent topicsListContainer">
+
+<!-- begin doc-metadata -->
+<div id="doc-metadata">
+<h2 class="title toc-ignore" style="display:none;">Data basics</h2>
+</div>
+<!-- end doc-metadata -->
+
+</div> <!-- bandContent.topicsListContainer -->
+</div> <!-- band -->
+</div> <!-- topicsPositioner -->
+</div> <!-- topicsContainer -->
+
+
+</div> <!-- bandContent page -->
+</div> <!-- pageContent band -->
+
+
+
+
+<script>
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+</script>
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+
+</html>

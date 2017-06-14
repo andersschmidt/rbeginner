@@ -126,6 +126,7 @@ There are three interrelated rules which make a dataset tidy:
 * Each variable must have its own column.
 * Each observation must have its own row.
 * Each value must have its own cell.
+
 ![](images/tidy-1.png)
 
 Dataframes in R can be constructed using the `tibble()` function. It is part of the *tidyverse* package, so we need to load that first.
@@ -148,8 +149,6 @@ df$name
 df$edu[1]
 sum(df$age)
 ```
-
-
 
 A small dataframe like this is easy to handle, but often you will have many variables and observations. R has various functions for easily getting an overview of a dataframe.
 

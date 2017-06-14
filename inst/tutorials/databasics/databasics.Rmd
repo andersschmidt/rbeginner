@@ -1,18 +1,131 @@
 ---
-title: "Tutorial"
+title: "Data basics"
 output: learnr::tutorial
 runtime: shiny_prerendered
 ---
 
 ```{r setup, include=FALSE}
 library(learnr)
+library(tidyverse)
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## Simple mutations of data using `dplyr`
-mutate
-group_by
-summarise
+R has some built-in functions for working with dataframes. As is often the case, however, a package has been made that makes this even easier. In this tutorial, we will use `dplyr` from the *tidyverse*.
 
-## Selecting data
+For this, we will use the built-in dataset call `iris`, which contain measurements lengths and widths for 50 flowers.
+
+```{r, echo = TRUE}
+head(iris, 3)
+```
+
+`dplyr` has 5 basic functions which cover most data challenges:
+
+* Pick observations by their values (`filter()`).
+* Reorder the rows (`arrange()`).
+* Pick variables by their names (`select()`).
+* Create new variables with functions of existing variables (`mutate()`).
+* Collapse many values down to a single summary (`summarise()`).
+
+### Exercise 1
+Run the code below to see how a new column is generated. Then change the code, so the difference between `Sepal.Length` and `Petal.Length` is also calculated.
+
+```{r mutate, exercise.lines = 5, exercise=TRUE}
+iris %>% 
+  mutate(product = Sepal.Length * Sepal.Width)
+```
+
+```{r mutate-hint}
+Additional columns can be separated by a comma: mutate(col1 = x, col2 = y)
+```
+
+```{r mutate-solution}
+iris %>% 
+  mutate(product = Sepal.Length * Sepal.Width,
+         diff = Sepal.Length - Petal.Length)
+```
+
+### The pipe operator (`%>%`)
+Did you notice the strange `%>%` operator used in the example above? It is called the pipe, and is used to forward a dataframe into the next function. Generally, `mutate()` takes a dataframe as the first argument (`mutate(.data, ...)`) and then a set of expressions to define new columns. `%>%` takes whatever is to the left of the operator, and 'pipes' it as the first argument to the function to the right. This means, that the following two lines of code are equivalent: 
+
+```{r, eval=FALSE, echo=TRUE}
+mutate(iris, product = Sepal.Length * Sepal.Width)
+iris %>% mutate(product = Sepal.Length * Sepal.Width)
+```
+
+Why the pipe is effiecient will become apparent in the next example. 
+
+## Generating summaries
+
+A very common problem in datascience is to generate some summary statistics for each group in a dataset. Our `iris` data contains three different types of flowers (`r unique(iris$Species)`). Let us calculate the mean value and standard deviation for the Sepal Length in each group. Notice that we can *chain* a set of operations using `%>%`.
+
+### Exercise 2
+Run the code below and see how the data is first group by *Species* and then summarised. 
+
+Then modify the code so that the product variable from the previous example is calculated, and calculate the summary of that instead. 
+
+```{r summarise, exercise.lines = 5, exercise = TRUE}
+iris %>% 
+  group_by(Species) %>% 
+  summarise(mean = mean(Sepal.Length), sd = sd(Sepal.Length))
+```
+
+```{r summarise-solution}
+iris %>% 
+  mutate(product = Sepal.Length * Sepal.Width) %>% 
+  group_by(Species) %>% 
+  summarise(mean = mean(product), sd = sd(product))
+```
+
+## Selecting and filtering data
+Sometimes you wish to select specific parts of your data for closer examination. We can use `select()` to choose a set of columns and `filter()` to select rows based on given criteria.
+
+
+### `select()`
+`select()` chooses columns by name, or via a few helper functions (`starts_with()` and `ends_with()`).
+
+```{r, echo = TRUE}
+iris %>% 
+  select(Species, starts_with('Sepal'))
+```
+
+### Exercise 3
+Write code that selects Species, Sepal.Length and Petal.Length.
+
+```{r select, exercise = TRUE, exercise.lines = 6}
+
+```
+
+```{r select-solution}
+iris %>% 
+  select(Species, Sepal.Length, Petal.Length) # Or use ends_with("Length")
+```
+
+### `filter()`
+We can also choose data based on various conditions. We could e.g. wish to select all the flowers with a Petal width equal to 0.1. R provides a set of comparison operators that makes this efficient: 
+
+* `>` (greater than)
+* `>=` (greater than or equal to)
+* `<` (less than)
+* `<=` (less than or equal to)
+* `!=` (not equal)
+* `==` (equal).
+
+```{r, echo = TRUE}
+iris %>% 
+  filter(Petal.Width == 0.1)
+```
+
+### Exercise 4
+To demonstrate how to use `filter()` fill in the missing pieces in the code below to find the flowers that have Sepal length larger than 6.5 and a Petal length larger than 6.0.
+
+```{r filter, exercise = TRUE}
+iris %>%
+  filter()
+```
+
+```{r filter-solution}
+iris %>%
+  filter(Sepal.Length > 6.5, Petal.Length > 6.0)
+```
 
