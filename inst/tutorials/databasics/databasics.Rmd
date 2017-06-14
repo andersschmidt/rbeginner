@@ -1,0 +1,18 @@
+---
+title: "Tutorial"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Simple mutations of data using `dplyr`
+mutate
+group_by
+summarise
+
+## Selecting data
+

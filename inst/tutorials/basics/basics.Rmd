@@ -1,5 +1,5 @@
 ---
-title: "Tutorial"
+title: "The R Safari"
 output: learnr::tutorial
 runtime: shiny_prerendered
 ---
@@ -7,69 +7,156 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+diamonds <- diamonds %>% select(-(x:z))
 ```
 
 
-## Topic 1
+## R is 'just' and advanced calculator
 
-### Exercise 
+R can output simple math by just putting it in the console or in a script and run it. We can use the ordinary math operators (+, -, *, /, ^) to add, subtract, etc. For example:
 
-*Here's a simple exercise with an empty code chunk provided for entering the answer.*
+```{r, echo=TRUE}
+1 + 2^2
+```
+
+However, calculating with raw numbers is not very useful. We can instead assign values to *variables* and work with them. To assign a value we use the operator `<-`
+
+```{r, echo=TRUE}
+a <- 1
+b <- 2
+a + b^b
+```
+
+#### Exercise 1
+
+Try assigning the value 2 to two different variables and add them together. Save the results as a new variable and print it.
 
 Write the R code required to add two plus two:
 
-```{r two-plus-two, exercise=TRUE}
+```{r twoplustwo, exercise=TRUE, exercise.lines = 5} 
 
 ```
 
-### Exercise with Code
-
-*Here's an exercise with some prepopulated code as well as `exercise.lines = 5` to provide a bit more initial room to work.*
-
-Now write a function that adds any two numbers and then call it:
-
-```{r add-function, exercise=TRUE, exercise.lines = 5}
-add <- function() {
-  
-}
+```{r twoplustwo-hint}
+a <- 
+b <- 
+c <- 
+c
 ```
 
-## Topic 2
-
-### Exercise with Hint
-
-*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
-
-Modify the following code to limit the number of rows printed to 5:
-
-```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
-mtcars
+```{r twoplustwo-solution}
+a <- 2
+b <- 2
+c <- a + b
+c
 ```
 
-```{r print-limit-hint}
-head(mtcars)
+## Vectors and variable types
+
+A vector is a common way of storing a list of similar objects. We can assign vectors, just like for single numbers. We can do math with vectors. We can add or remove elements, or select parts of a vector.
+
+### Exercise 2
+The code below uses the `c()` function to create a vector of integers. We then add `10` to the vector, and as you can see, `10` is added to each element in the vector. We can apply other math operators to vectors aswell.
+
+We can assign vectors in many ways, manually as below, or using other built-in functions in R. One example is the `seq()` function that generates a sequence of numbers. Assign a sequence from 1 to 5 by assigning `seq(from = 1, to = 5, by = 1)` to `vec_b` and add it to `vec_a`. Check that the result is what you expect.
+
+```{r vectors, exercise=TRUE, exercise.eval=TRUE}
+vec_a <- c(1, 8, 0, 2, 6)
+vec_a + 10
 ```
 
-### Quiz
+```{r vectors-solution}
+vec_a <- c(1, 8, 0, 2, 6)
+vec_b <- seq(from = 1, to = 5, by = 1)
+vec_a + vec_b
+```
 
-*You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
+### Variable types
+The numbers we have worked with so far are *integers*. R knows how to handle other types of data. The following are the ones you will commonly encounter:
 
-Some questions to verify that you understand the purposes of various base and recommended R packages:
+* Integer (e.g. 1, 3, 100, 739)
+* Numeric (3.14, 25.9, 108.928)
+* Character ("name", "test") - note that characters are always in quotes
+* Logical (TRUE, FALSE)
 
-```{r quiz}
-quiz(
-  question("Which package contains functions for installing other R packages?",
-    answer("base"),
-    answer("tools"),
-    answer("utils", correct = TRUE),
-    answer("codetools")
-  ),
-  question("Which of the R packages listed below are used to create plots?",
-    answer("lattice", correct = TRUE),
-    answer("tools"),
-    answer("stats"),
-    answer("grid", correct = TRUE)
-  )
-)
+The distinction is important. Vectors can only contain objects of a single type, and trying to mix them can cause problems.
+
+R has a set of functions for converting variable types if necessary. You could e.g. have a character vector containing numbers that you with to do calculations with. We can use the `as.numeric()` function to convert them as in the example below. There are obviously also functions `as.character()`, `as.integer()`, `as.logical()` and more.
+
+```{r, echo=TRUE, warning=TRUE, error=TRUE}
+a <- c("2.48", "1.98", "5.49")
+a * 2
+as.numeric(a) * 2
+```
+
+### Optional exercise
+What happens when you try to mix variable types? Play around with the following code - what happens if you run `as.numeric()`?
+
+```{r mixedtypes, exercise=TRUE, exercise.eval=TRUE}
+(a <- c("-.1"," 2.7 ","B", TRUE))
+```
+
+
+## Functions and arguments
+
+In addition to simple math, R can use *functions* to manipulate objects. We have actually already seen some functions, e.g. `c()` and `seq()` that we used to create vectors. A function usually takes a number of arguments as input between the parantheses, and then gives an output. If you don't know how to specify the arguments to a function you can enter `?` followed by the function name (eg. `?seq`) in the console and read the documentation. Other examples of simple functions are `sqrt()` to calculate the square-root of a number, and `mean()` which takes a vector and calculates the mean.
+
+### Exercise 3
+Calculate the square-root of `a` and the mean of `b` below.
+
+```{r functions, exercise = TRUE}
+a <- 3.141592
+b <- c(2.83, 4.85, 1.39, 8.01)
+
+```
+
+```{r functions-solution}
+a <- 3.141592
+sqrt(a)
+b <- c(2.83, 4.85, 1.39, 8.01)
+mean(b)
+```
+
+## Data frames and tidy data
+Often we have some data, where for each observation we have recorded several values of interest. The most straight-forward way to store such data is in a data-frame (or a tibble as it is also called). The data can be stored in a *tidy* format as illustrated below for the easiest access and manipulation. 
+
+There are three interrelated rules which make a dataset tidy:
+
+* Each variable must have its own column.
+* Each observation must have its own row.
+* Each value must have its own cell.
+![](images/tidy-1.png)
+
+Dataframes in R can be constructed using the `tibble()` function. It is part of the *tidyverse* package, so we need to load that first.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+df <- tibble(name = c("Emil", "Anders"),
+             age = c(27, 27),
+             height = c(170, 175),
+             postcode = c(8000, 8000),
+             edu = c("Nanoscience", "Medicine"))
+df
+```
+
+As you can see, we can easily organise our data in a tibble. From the output you can see the data-type of each column. We can access columns (`$`) or single values (`[]`), apply functions etc:
+
+```{r, echo = TRUE}
+df$name
+df$edu[1]
+sum(df$age)
+```
+
+
+
+A small dataframe like this is easy to handle, but often you will have many variables and observations. R has various functions for easily getting an overview of a dataframe.
+
+### Exercise 4
+A built-in example of a large dataset is called `diamonds`, and contains information about the price and quality of 53940 diamonds. Try using the functions `head()`, `summary()`, `str()` and `glimpse()` to gain information about the dataset.
+
+```{r dataframe, exercise=TRUE, exercise.eval=TRUE}
+diamonds
 ```
 
