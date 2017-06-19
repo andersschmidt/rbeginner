@@ -136,7 +136,7 @@ library(tidyverse)
 
 df <- tibble(name = c("Emil", "Anders"),
              age = c(27, 27),
-             height = c(170, 175),
+             height = c(170, 185),
              postcode = c(8000, 8000),
              edu = c("Nanoscience", "Medicine"))
 df
